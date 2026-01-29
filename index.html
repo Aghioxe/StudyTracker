@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Tracker - Productivity Dashboard</title>
+    <meta name="description" content="Professional productivity tracker with task management, analytics, and Pomodoro timer">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="responsive.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">📚</span>
+                    <h1>Study Tracker</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalTasks">0</span>
+                        <span class="stat-label">Total Tasks</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="completedTasks">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="completionRate">0%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column: Task Management -->
+                <div class="tasks-section">
+                    <!-- Add Task Form -->
+                    <section class="card form-card">
+                        <h2 class="card-title">Add New Task</h2>
+                        <form id="taskForm" class="task-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="taskTitle">Task Title *</label>
+                                    <input 
+                                        type="text" 
+                                        id="taskTitle" 
+                                        name="title" 
+                                        placeholder="e.g., Complete CS Assignment"
+                                        required
+                                        maxlength="100"
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskCategory">Category</label>
+                                    <select id="taskCategory" name="category">
+                                        <option value="study">📖 Study</option>
+                                        <option value="work">💼 Work</option>
+                                        <option value="personal">🏠 Personal</option>
+                                        <option value="health">💪 Health</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="taskDescription">Description</label>
+                                <textarea 
+                                    id="taskDescription" 
+                                    name="description" 
+                                    placeholder="Add details about this task..."
+                                    rows="2"
+                                    maxlength="500"
+                                ></textarea>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="taskDeadline">Deadline *</label>
+                                    <input 
+                                        type="date" 
+                                        id="taskDeadline" 
+                                        name="deadline"
+                                        required
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <label for="taskPriority">Priority</label>
+                                    <select id="taskPriority" name="priority">
+                                        <option value="low">🟢 Low</option>
+                                        <option value="medium" selected>🟡 Medium</option>
+                                        <option value="high">🔴 High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <span>+</span> Add Task
+                            </button>
+                        </form>
+                    </section>
+
+                    <!-- Filters & Search -->
+                    <section class="card filters-card">
+                        <div class="filters-row">
+                            <div class="search-box">
+                                <input 
+                                    type="text" 
+                                    id="searchInput" 
+                                    placeholder="Search tasks..."
+                                    aria-label="Search tasks"
+                                >
+                                <span class="search-icon">🔍</span>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <select id="filterStatus" class="filter-select">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">⏳ Pending</option>
+                                    <option value="in-progress">▶️ In Progress</option>
+                                    <option value="completed">✅ Completed</option>
+                                    <option value="skipped">⏭️ Skipped</option>
+                                </select>
+                                
+                                <select id="filterCategory" class="filter-select">
+                                    <option value="all">All Categories</option>
+                                    <option value="study">📖 Study</option>
+                                    <option value="work">💼 Work</option>
+                                    <option value="personal">🏠 Personal</option>
+                                    <option value="health">💪 Health</option>
+                                </select>
+                                
+                                <select id="sortBy" class="filter-select">
+                                    <option value="newest">Newest First</option>
+                                    <option value="deadline">Deadline</option>
+                                    <option value="priority">Priority</option>
+                                    <option value="alphabetical">A-Z</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Task List -->
+                    <section class="card tasks-card">
+                        <div class="tasks-header">
+                            <h2 class="card-title">Your Tasks</h2>
+                            <button id="clearCompleted" class="btn btn-text" style="display: none;">
+                                Clear Completed
+                            </button>
+                        </div>
+                        <div id="taskList" class="task-list">
+                            <!-- Tasks will be rendered here -->
+                        </div>
+                        <div id="emptyState" class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <h3>No tasks yet</h3>
+                            <p>Add your first task above to get started!</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right Column: Analytics & Timer -->
+                <div class="analytics-section">
+                    <!-- Pomodoro Timer -->
+                    <section class="card timer-card">
+                        <h2 class="card-title">Pomodoro Timer</h2>
+                        <div class="timer-display">
+                            <div class="timer-circle">
+                                <svg viewBox="0 0 100 100">
+                                    <circle class="timer-bg" cx="50" cy="50" r="45"/>
+                                    <circle class="timer-progress" cx="50" cy="50" r="45" id="timerProgress"/>
+                                </svg>
+                                <div class="timer-time" id="timerTime">25:00</div>
+                            </div>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="timerStart" class="btn btn-primary">Start</button>
+                            <button id="timerPause" class="btn btn-secondary" disabled>Pause</button>
+                            <button id="timerReset" class="btn btn-ghost">Reset</button>
+                        </div>
+                        <div class="timer-modes">
+                            <button class="timer-mode active" data-time="25">Work (25m)</button>
+                            <button class="timer-mode" data-time="5">Short Break (5m)</button>
+                            <button class="timer-mode" data-time="15">Long Break (15m)</button>
+                        </div>
+                    </section>
+
+                    <!-- Charts -->
+                    <section class="card chart-card">
+                        <h2 class="card-title">Task Distribution</h2>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="card chart-card">
+                        <h2 class="card-title">Weekly Progress</h2>
+                        <div class="chart-container">
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
+                    </section>
+
+                    <!-- Contribution Graph -->
+                    <section class="card contrib-card">
+                        <h2 class="card-title">Activity Heatmap</h2>
+                        <p class="card-subtitle">Last 30 days of productivity</p>
+                        <div id="contributionGraph" class="contribution-graph">
+                            <!-- Generated by JS -->
+                        </div>
+                        <div class="contrib-legend">
+                            <span>Less</span>
+                            <div class="contrib-level level-0"></div>
+                            <div class="contrib-level level-1"></div>
+                            <div class="contrib-level level-2"></div>
+                            <div class="contrib-level level-3"></div>
+                            <div class="contrib-level level-4"></div>
+                            <span>More</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Study Tracker &copy; 2025 | Built with pure HTML, CSS & JavaScript</p>
+            <div class="footer-actions">
+                <button id="exportData" class="btn btn-text">Export Data</button>
+                <button id="importData" class="btn btn-text">Import Data</button>
+                <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Edit Task Modal -->
+    <div id="editModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Edit Task</h2>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <form id="editForm" class="task-form">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label for="editTitle">Task Title *</label>
+                    <input type="text" id="editTitle" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" rows="3" maxlength="500"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCategory">Category</label>
+                        <select id="editCategory">
+                            <option value="study">📖 Study</option>
+                            <option value="work">💼 Work</option>
+                            <option value="personal">🏠 Personal</option>
+                            <option value="health">💪 Health</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPriority">Priority</label>
+                        <select id="editPriority">
+                            <option value="low">🟢 Low</option>
+                            <option value="medium">🟡 Medium</option>
+                            <option value="high">🔴 High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editDeadline">Deadline</label>
+                    <input type="date" id="editDeadline" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status</label>
+                    <select id="editStatus">
+                        <option value="pending">⏳ Pending</option>
+                        <option value="in-progress">▶️ In Progress</option>
+                        <option value="completed">✅ Completed</option>
+                        <option value="skipped">⏭️ Skipped</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="storage.js"></script>
+    <script src="taskManager.js"></script>
+    <script src="charts.js"></script>
+    <script src="timer.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
